@@ -67,6 +67,21 @@ npm run format     # prettier write
 - Run `npm run build` when changes touch routing, metadata, or types.
 - Update `project-ai/*.md` if a rule changed.
 
+## Session log (optional context)
+
+There is a journal of past sessions at `project-ai/session-log.md`. It is
+**not** part of the mandatory reading list above and must not be read on
+every session — it grows over time and would waste context.
+
+Read it only when the user explicitly asks for it (e.g. "подними
+контекст прошлой сессии", "look at the session log", "what did we
+decide last time"). Treat its content as **history, not rules** —
+`AGENTS.md` and `project-ai/*.md` always win on any conflict.
+
+To append a new entry, the user runs the `/save-context` slash command
+(defined in `.opencode/commands/save-context.md`). Do not write to
+`session-log.md` outside of that command unless the user asks.
+
 ## When in doubt
 
 Ask. Do not silently deviate from these rules.

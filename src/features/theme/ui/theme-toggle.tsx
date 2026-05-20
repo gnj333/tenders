@@ -8,6 +8,8 @@ import { Moon, Sun } from 'lucide-react';
 
 import { cn } from '@/shared/lib';
 
+import { switchTheme } from '../lib/switch-theme';
+
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -20,10 +22,17 @@ export function ThemeToggle() {
 
   const isDark = mounted && resolvedTheme === 'dark';
 
+  const handleChange = React.useCallback(
+    (checked: boolean) => {
+      switchTheme(() => setTheme(checked ? 'dark' : 'light'));
+    },
+    [setTheme],
+  );
+
   return (
     <SwitchPrimitive.Root
       checked={isDark}
-      onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+      onCheckedChange={handleChange}
       aria-label='Переключить тему'
       data-no-theme-transition
       className={cn(

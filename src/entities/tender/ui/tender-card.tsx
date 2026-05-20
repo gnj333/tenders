@@ -24,7 +24,7 @@ export function TenderCard({ tender, className, actionSlot }: Props) {
   return (
     <article
       className={cn(
-        'group bg-card hover:border-primary/50 relative flex flex-col gap-3 rounded-lg border p-5 shadow-sm transition-colors',
+        'group bg-card hover:border-primary/50 relative flex h-full flex-col gap-3 rounded-lg border p-5 shadow-sm transition-colors',
         className,
       )}
     >

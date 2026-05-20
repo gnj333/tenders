@@ -152,25 +152,47 @@
       'calt' 1;
   }
 
-  /* Плавная анимация смены темы.
-     Покрывает фон, цвет текста, бордеры, тени. */
-  :root,
-  :root *,
-  :root *::before,
-  :root *::after {
+  /* Плавная смена темы — только в момент переключения.
+     Класс `theme-transition` ставится на <html> на ~350ms, после чего снимается.
+     В остальное время никаких глобальных transition нет, что убирает фризы
+     на hover/focus и облегчает paint при сложном DOM. */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
     transition:
-      background-color 300ms ease,
-      border-color 300ms ease,
-      color 300ms ease,
-      fill 300ms ease,
-      stroke 300ms ease,
-      box-shadow 300ms ease;
+      background-color 250ms ease,
+      border-color 250ms ease,
+      color 250ms ease !important;
   }
 
-  /* Не анимируем то, что и так двигается/трансформируется. */
+  /* Тумблер темы не участвует в общем кроссфейде — у него своя morph-анимация. */
   [data-no-theme-transition],
   [data-no-theme-transition] * {
     transition: none !important;
+  }
+
+  /* View Transitions API: нативный кроссфейд между состояниями темы.
+     Поддерживается в Chrome/Edge/Safari. В Firefox автоматически срабатывает fallback
+     на класс `theme-transition`. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 250ms;
+    animation-timing-function: ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.theme-transition,
+    html.theme-transition *,
+    html.theme-transition *::before,
+    html.theme-transition *::after {
+      transition: none !important;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none !important;
+    }
   }
 }
 
