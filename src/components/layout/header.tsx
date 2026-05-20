@@ -1,33 +1,46 @@
 import Link from 'next/link';
 
+import { LogIn } from 'lucide-react';
+
 import { siteConfig } from '@/shared/config';
 
 import { NotificationsBell } from '@/entities/notification';
 import { ThemeToggle } from '@/features/theme';
 
+import { Button } from '@/components/ui/button';
+
+import { HeaderNav } from './header-nav';
+
 export function Header() {
   return (
-    <header
-      className='border-border bg-surface/80 supports-[backdrop-filter]:bg-surface/60 sticky top-0 z-40 w-full border-b backdrop-blur'
-      role='banner'
-    >
-      <div className='mx-auto flex h-14 max-w-6xl items-center justify-between px-4'>
-        <Link href='/' className='text-text flex items-center gap-2 font-semibold' aria-label={`${siteConfig.name} — на главную`}>
+    <header className='sticky top-0 z-40 w-full px-4 pt-3 sm:pt-4' role='banner'>
+      <div
+        className={[
+          'mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-3 sm:px-4',
+          // glass-эффект
+          'border-border/60 bg-surface/55 supports-[backdrop-filter]:bg-surface/40 rounded-2xl border shadow-sm backdrop-blur-xl',
+        ].join(' ')}
+      >
+        <Link
+          href='/'
+          className='text-text hover:text-primary flex items-center gap-2 font-semibold transition-colors'
+          aria-label={`${siteConfig.name} — на главную`}
+        >
           <span aria-hidden className='bg-primary inline-block size-2 rounded-full' />
           {siteConfig.name}
         </Link>
 
-        <nav aria-label='Основная навигация' className='text-text-secondary hidden items-center gap-6 text-sm md:flex'>
-          {siteConfig.nav.map((item) => (
-            <Link key={item.href} href={item.href} className='hover:text-text transition-colors'>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <HeaderNav />
 
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-1.5 sm:gap-2'>
           <NotificationsBell />
           <ThemeToggle />
+          <Button asChild size='sm' className='ml-1 gap-1.5'>
+            <Link href={siteConfig.loginHref}>
+              <LogIn aria-hidden className='size-4' />
+              Вход
+            </Link>
+          </Button>
         </div>
       </div>
     </header>
