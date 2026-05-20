@@ -1,49 +1,239 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* base palette */
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --card: #ffffff;
+
+  --text: #1a1a1a;
+  --text-secondary: #6b6b6b;
+
+  --border: #e8e8e8;
+
+  --primary: #6b0e1e;
+  --primary-hover: #54091a;
+
+  --soft-accent: #fbeaec;
+
+  /* shadcn tokens (привязаны к нашим переменным) */
+  --background: var(--bg);
+  --foreground: var(--text);
+
+  --card-foreground: var(--text);
+
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--soft-accent);
+  --secondary-foreground: var(--primary);
+
+  --muted: var(--bg);
+  --muted-foreground: var(--text-secondary);
+
+  --accent: var(--soft-accent);
+  --accent-foreground: var(--primary);
+
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+
+  --input: var(--border);
+  --ring: var(--primary);
+
+  --radius: 0.625rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark {
+  --bg: #12111a;
+  --surface: #1a1822;
+  --card: #1f1c2a;
+
+  --text: #f3f1ea;
+  --text-secondary: #a39db0;
+
+  --border: #2c2738;
+
+  --primary: #6b0e1e;
+  --primary-hover: #8a1428;
+
+  --soft-accent: #3a1219;
+
+  --background: var(--bg);
+  --foreground: var(--text);
+
+  --card-foreground: var(--text);
+
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+
+  --primary-foreground: #f3f1ea;
+
+  --secondary: var(--soft-accent);
+  --secondary-foreground: var(--text);
+
+  --muted: var(--surface);
+  --muted-foreground: var(--text-secondary);
+
+  --accent: var(--soft-accent);
+  --accent-foreground: var(--text);
+
+  --destructive: #ef4444;
+  --destructive-foreground: #f3f1ea;
+
+  --input: var(--border);
+  --ring: var(--primary);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-soft-accent: var(--soft-accent);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  /* Плавная анимация смены темы.
+     Покрывает фон, цвет текста, бордеры, тени. */
+  :root,
+  :root *,
+  :root *::before,
+  :root *::after {
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      color 300ms ease,
+      fill 300ms ease,
+      stroke 300ms ease,
+      box-shadow 300ms ease;
+  }
+
+  /* Не анимируем то, что и так двигается/трансформируется. */
+  [data-no-theme-transition],
+  [data-no-theme-transition] * {
+    transition: none !important;
   }
 }
 
-html {
-  height: 100%;
+/* Morph-анимация thumb тумблера темы.
+   Кружок плавно растягивается на всю ширину дорожки, затем стягивается с другой стороны.
+   Геометрия рассчитана под трек w-11 (2.75rem) и thumb size-5 (1.25rem), отступ 0.125rem с краёв. */
+@keyframes thumb-morph-to-right {
+  0% {
+    left: 0.125rem;
+    width: 1.25rem;
+  }
+  50% {
+    left: 0.125rem;
+    width: calc(100% - 0.25rem);
+  }
+  100% {
+    left: calc(100% - 1.375rem);
+    width: 1.25rem;
+  }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+@keyframes thumb-morph-to-left {
+  0% {
+    left: calc(100% - 1.375rem);
+    width: 1.25rem;
+  }
+  50% {
+    left: 0.125rem;
+    width: calc(100% - 0.25rem);
+  }
+  100% {
+    left: 0.125rem;
+    width: 1.25rem;
+  }
 }
 
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.theme-toggle-thumb {
+  position: absolute;
+  top: 50%;
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-top: -0.625rem;
+  left: 0.125rem;
+  will-change: left, width;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+.theme-toggle-thumb[data-state='checked'] {
+  left: calc(100% - 1.375rem);
+  animation: thumb-morph-to-right 500ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.theme-toggle-thumb[data-state='unchecked'] {
+  left: 0.125rem;
+  animation: thumb-morph-to-left 500ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* Уважаем настройку «уменьшить движение» в ОС */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-thumb[data-state='checked'],
+  .theme-toggle-thumb[data-state='unchecked'] {
+    animation: none;
+    transition:
+      left 150ms ease-out,
+      width 150ms ease-out;
   }
 }

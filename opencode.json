@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "project-ai/architecture.md",
+    "project-ai/folder-structure.md",
+    "project-ai/state-management.md",
+    "project-ai/nextjs-rules.md",
+    "project-ai/seo-rules.md",
+    "project-ai/frontend-rules.md",
+    "project-ai/ui-rules.md",
+    "project-ai/coding-standards.md"
+  ]
+}
