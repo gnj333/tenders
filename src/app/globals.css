@@ -4,6 +4,20 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* motion tokens (durations + easings) — единая шкала анимаций.
+     Используются tw-animate-css через переменные --tw-animation-duration и --tw-ease,
+     а также утилитами motion-*. Не хардкодим длительности в компонентах. */
+  --motion-duration-fast: 140ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-slow: 320ms;
+
+  /* «soft pop» — стандартный popover/menu */
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* зеркальный ease-in для exit */
+  --motion-ease-in: cubic-bezier(0.4, 0, 0.6, 1);
+  /* generic easing для fade/overlay */
+  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
   /* base palette */
   --bg: #fafafa;
   --surface: #ffffff;
@@ -131,6 +145,84 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Семантические утилиты анимаций.
+   Один источник правды для open/close-анимаций любого Radix-компонента
+   с `data-state="open|closed"`. Применяй на корневом элементе контента:
+     - motion-pop      → меню/popover/select: fade + лёгкий zoom + smooth slide со стороны
+     - motion-fade     → простая прозрачность (тост, тонкий хинт)
+     - motion-overlay  → backdrop диалога/шита: только fade
+   Длительность/easing берутся из motion-токенов и единые для всего проекта.
+
+   Реализация: через @apply подключаем animate-in/animate-out из tw-animate-css
+   (это гарантирует, что keyframes enter/exit окажутся в финальном CSS), а тонкости
+   (длительность, easing, геометрия enter/exit) задаём CSS-переменными. */
+@utility motion-pop {
+  /* enter-геометрия: fade + лёгкий zoom + сдвиг на 0.5rem со стороны якоря */
+  --tw-enter-opacity: 0;
+  --tw-enter-scale: 0.96;
+  --tw-exit-opacity: 0;
+  --tw-exit-scale: 0.97;
+
+  &[data-side='bottom'] {
+    --tw-enter-translate-y: -0.5rem;
+  }
+  &[data-side='top'] {
+    --tw-enter-translate-y: 0.5rem;
+  }
+  &[data-side='left'] {
+    --tw-enter-translate-x: 0.5rem;
+  }
+  &[data-side='right'] {
+    --tw-enter-translate-x: -0.5rem;
+  }
+
+  &[data-state='open'] {
+    @apply animate-in;
+    --tw-animation-duration: var(--motion-duration-base);
+    --tw-ease: var(--motion-ease-out);
+  }
+
+  &[data-state='closed'] {
+    @apply animate-out;
+    --tw-animation-duration: var(--motion-duration-fast);
+    --tw-ease: var(--motion-ease-in);
+  }
+}
+
+@utility motion-fade {
+  --tw-enter-opacity: 0;
+  --tw-exit-opacity: 0;
+
+  &[data-state='open'] {
+    @apply animate-in;
+    --tw-animation-duration: var(--motion-duration-base);
+    --tw-ease: var(--motion-ease-standard);
+  }
+
+  &[data-state='closed'] {
+    @apply animate-out;
+    --tw-animation-duration: var(--motion-duration-fast);
+    --tw-ease: var(--motion-ease-standard);
+  }
+}
+
+@utility motion-overlay {
+  --tw-enter-opacity: 0;
+  --tw-exit-opacity: 0;
+
+  &[data-state='open'] {
+    @apply animate-in;
+    --tw-animation-duration: var(--motion-duration-base);
+    --tw-ease: var(--motion-ease-standard);
+  }
+
+  &[data-state='closed'] {
+    @apply animate-out;
+    --tw-animation-duration: var(--motion-duration-fast);
+    --tw-ease: var(--motion-ease-standard);
+  }
+}
+
 @layer base {
   * {
     border-color: var(--border);
@@ -196,6 +288,28 @@
     ::view-transition-old(root),
     ::view-transition-new(root) {
       animation: none !important;
+    }
+
+    /* motion-* утилиты схлопываются в мгновенное появление/исчезновение
+       без сдвигов и зума — только короткий fade ради читаемости. */
+    .motion-pop,
+    .motion-fade,
+    .motion-overlay {
+      --tw-enter-scale: 1;
+      --tw-exit-scale: 1;
+      --tw-enter-translate-x: 0;
+      --tw-enter-translate-y: 0;
+      --tw-exit-translate-x: 0;
+      --tw-exit-translate-y: 0;
+    }
+
+    .motion-pop[data-state='open'],
+    .motion-fade[data-state='open'],
+    .motion-overlay[data-state='open'],
+    .motion-pop[data-state='closed'],
+    .motion-fade[data-state='closed'],
+    .motion-overlay[data-state='closed'] {
+      animation-duration: 1ms !important;
     }
   }
 }

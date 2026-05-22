@@ -1,15 +1,12 @@
 import Link from 'next/link';
 
-import { LogIn } from 'lucide-react';
-
 import { siteConfig } from '@/shared/config';
 
 import { NotificationsBell } from '@/entities/notification';
 import { ThemeToggle } from '@/features/theme';
 
-import { Button } from '@/components/ui/button';
-
 import { HeaderNav } from './header-nav';
+import { HeaderUser } from './header-user';
 
 export function Header() {
   return (
@@ -35,12 +32,7 @@ export function Header() {
         <div className='flex items-center gap-1.5 sm:gap-2'>
           <NotificationsBell />
           <ThemeToggle />
-          <Button asChild size='sm' className='ml-1 gap-1.5'>
-            <Link href={siteConfig.loginHref}>
-              <LogIn aria-hidden className='size-4' />
-              Вход
-            </Link>
-          </Button>
+          <HeaderUser />
         </div>
       </div>
     </header>

@@ -5,8 +5,10 @@
 - shadcn/ui style: `new-york`. Components live in `src/components/ui/`.
 - Tailwind v4 with `@theme inline` tokens in `src/app/globals.css`.
 - Icons: `lucide-react`, size via Tailwind (`size-4`, `size-5`).
-- Animations: prefer CSS keyframes + transitions. For complex sequences use
-  `tw-animate-css`. Respect `prefers-reduced-motion`.
+- Animations: use the `motion-*` utilities from `globals.css` (see the
+  Animation section below). Do not hand-write `data-[state=open]:animate-in
+fade-in-0 zoom-in-95 ...` chains in components. Respect
+  `prefers-reduced-motion` (already handled by the utilities).
 
 ## Design tokens
 
@@ -91,9 +93,73 @@ export function Card({ className, padding, ...props }: Props) {
 
 ## Animation
 
+### CSS transitions
+
 - Default transition: `transition-{colors|transform|all} duration-200 ease-out`.
 - Theme transition is global in `globals.css` (300ms).
 - Respect `prefers-reduced-motion: reduce`. Disable or shorten.
+
+### Motion tokens
+
+Single source of truth for any open/close animation lives in
+`globals.css`:
+
+- Durations: `--motion-duration-fast` (140ms), `--motion-duration-base`
+  (220ms), `--motion-duration-slow` (320ms).
+- Easings: `--motion-ease-out` (soft pop, enter), `--motion-ease-in`
+  (mirror for exit), `--motion-ease-standard` (generic fade/overlay).
+
+Never hardcode durations or easings in components. If a specific component
+needs a different rhythm — override the token inline in `className`:
+
+```tsx
+<PopoverContent className='[--motion-duration-base:300ms]' />
+```
+
+### `motion-*` utilities
+
+Use these on the **root content element** of any Radix component that has
+`data-state="open|closed"`. They wire up `animate-in`/`animate-out` from
+`tw-animate-css`, hook into Radix `data-side`, and pull duration/easing
+from motion tokens. `prefers-reduced-motion` is honored automatically.
+
+| Utility          | When to use                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| `motion-pop`     | Popover, Dropdown/Context menu, Select content, Tooltip, Dialog content, Hover card. |
+| `motion-fade`    | Toast, inline hint, subtle reveal without movement.                                  |
+| `motion-overlay` | Dialog/Sheet backdrop. Pure fade.                                                    |
+
+`motion-pop` does: fade + light zoom (0.96 → 1) + 0.5rem slide from the
+anchor side (`data-side` aware). Enter 220ms ease-out, exit 140ms ease-in
+(exits are intentionally faster).
+
+### Pattern
+
+Inside any new `components/ui/*.tsx` Radix wrapper, use the utility on
+content:
+
+```tsx
+function PopoverContent({ className, ...props }: Props) {
+  return (
+    <PopoverPrimitive.Content
+      className={cn('border-border bg-surface rounded-lg border shadow-lg', 'motion-pop', className)}
+      {...props}
+    />
+  );
+}
+```
+
+### Forbidden
+
+- Hand-writing `data-[state=open]:animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 ...`
+  in component files. Compose via `motion-*` utilities instead — if a new
+  variation is genuinely needed, add a new `@utility` in `globals.css`.
+- Hardcoded ms / cubic-bezier values in components (use motion tokens).
+- Pure `animation-name: enter` without the `animate-in/out` apply or the
+  full `animation` shorthand — keyframes get tree-shaken or duration stays
+  at `0s` and nothing plays.
+- Animating layout-affecting properties (`width`, `height`, `top`, `left`)
+  inside `motion-*`. These utilities animate `opacity` + `transform` only.
 
 ## Forms
 

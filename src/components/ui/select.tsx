@@ -45,7 +45,7 @@ function SelectContent({
         position={position}
         className={cn(
           'border-border bg-surface text-text relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          'motion-pop',
           position === 'popper' && 'data-[side=bottom]:translate-y-1',
           className,
         )}

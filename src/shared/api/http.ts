@@ -31,11 +31,15 @@ function buildUrl(path: string, searchParams?: FetchOptions['searchParams']): st
  * - Parses JSON when the response Content-Type is JSON; otherwise returns `undefined`.
  */
 export async function http<T>(path: string, options: FetchOptions = {}): Promise<T> {
-  const { body, searchParams, headers, next, ...rest } = options;
+  const { body, searchParams, headers, next, credentials, ...rest } = options;
   const url = buildUrl(path, searchParams);
 
   const init: RequestInit & { next?: FetchOptions['next'] } = {
     ...rest,
+    // Always send session cookies. Same-origin requests already include them
+    // by default, but being explicit makes the contract obvious and survives
+    // a future move of the API to a different host (with proper CORS).
+    credentials: credentials ?? 'include',
     headers: {
       Accept: 'application/json',
       ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),

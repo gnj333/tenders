@@ -12,6 +12,8 @@ const STATIC_ROUTES: ReadonlyArray<{
   { path: '/', changeFrequency: 'weekly', priority: 1 },
   { path: '/tenders', changeFrequency: 'hourly', priority: 0.9 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/login', changeFrequency: 'yearly', priority: 0.3 },
+  { path: '/register', changeFrequency: 'yearly', priority: 0.3 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
